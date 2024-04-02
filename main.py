@@ -40,7 +40,7 @@ fastapi_app = FastAPI()
 
 def app():
     handler = JoiaHandler(path="/")
-    return fp.make_app(handler, api_key="cPeM38xgnqetP4pucdw0r0V5KzzEruvA")
+    return fp.make_app(handler, api_key="cPeM38xgnqetP4pucdw0r0V5KzzEruvA", app=fastapi_app)
 
 # To run it
 # poetry shell
