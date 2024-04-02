@@ -6,21 +6,35 @@ from fastapi import FastAPI
 import fastapi_poe as fp
 
 
-# Demo handler that responds back the last message, word by word
 class JoiaHandler(fp.PoeBot):
     async def get_response(
         self, request: fp.QueryRequest
     ) -> AsyncIterable[fp.PartialResponse]:
-        last_message = request.query[-1].content
-        # Split the last message into words
-        words = last_message.split()
-        
-        # Iterate through each word in the message
-        for word in words:
-            # Yield a partial response with the current word
-            yield fp.PartialResponse(text=word)
-            # Wait for 500ms before continuing to the next word
-            await asyncio.sleep(0.1)
+        text = request.query[-1].content
+
+        # Below: GPT generated code that returns the text reversed word by word,
+        # while gracefully handling newlines and paragraphs.
+        paragraphs = text.split("\n\n")
+
+        for paragraph_index, paragraph in enumerate(paragraphs):
+            lines = paragraph.split("\n")
+            for line_index, line in enumerate(lines):
+
+                words = line.split()
+                reversed_words = reversed(words)
+
+                for word in reversed_words:
+                    yield fp.PartialResponse(text=word)
+                    yield fp.PartialResponse(text=" ")
+                    await asyncio.sleep(0.1)
+
+                if line_index < len(lines) - 1:
+                    yield fp.PartialResponse(text="\n")
+
+            if paragraph_index < len(paragraphs) - 1:
+                yield fp.PartialResponse(text="\n\n")
+            
+            
 
 fastapi_app = FastAPI()
 
